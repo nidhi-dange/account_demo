@@ -1,0 +1,143 @@
+#%RAML 1.0
+baseUri: http://http://account-application.us-e2.cloudhub.io/api
+title: Account API
+version: v1
+types:
+  Account: !include Datatype/AccountdataType.raml
+  AccountWithoutID: !include Datatype/AccountWithoutIDdataType.raml
+  AccountOptionalType: !include Datatype/AccountOptionalTypedataType.raml
+securitySchemes:
+  oauth_2_0:
+    description: |
+      This API supports OAuth 2.0 for authenticating all API requests.
+    type: OAuth 2.0
+    describedBy:
+      queryParameters:
+        access_token:
+          description: |
+             Used to send a valid OAuth 2 access token.
+          type: string
+      responses:
+        400:
+          description: Invalid token.
+        401:
+          description: |
+            Unauthorized or Connection error when connecting to the authorization server.
+        403:
+          description: |
+            Forbidden, invalid client application credentials.
+        500:
+          description: |
+            Bad response from authorization server, or WSDL SOAP Fault error.
+    settings:
+      authorizationUri: https://dev-165229.okta.com/oauth2/ausrbvsxzdraLub0l4x5/v1/authorize
+      accessTokenUri: https://dev-165229.okta.com/oauth2/ausrbvsxzdraLub0l4x5/v1/token
+      authorizationGrants: ["authorization_code","implicit"]
+/account:
+  /{ID}:
+    get:
+      securedBy:
+        - oauth_2_0
+          
+      queryParameters:
+        type:
+          required: false
+          enum: 
+            - business
+            - personal
+      responses:
+        200:
+          body:
+            application/json:
+              type: AccountOptionalType[]
+              example:
+                !include Example/Accountexample.raml
+    put:
+      securedBy:
+        - oauth_2_0
+          
+      description: This method is used to add an account
+      responses:
+        201:
+          body:
+            application/json:
+              example:
+                message:
+                  "account replaced (but not really)" 
+    patch:
+      securedBy:
+        - oauth_2_0
+          
+      description: this method is used to modify an account
+      responses:
+        201:
+          body:
+            application/json:
+              example:
+                message:
+                  "account modified (but not really)"
+    delete:
+      securedBy:
+        - oauth_2_0
+          
+      description: this method is used to delete an account
+      responses:
+        201:
+          body:
+            application/json:
+              example:
+                message:
+                  "account deleted (but not really)"
+      
+      
+  get:
+    securedBy:
+      - oauth_2_0
+        
+    description: This is GET method.It return records that match that account's type.
+    queryParameters:
+      type:
+        required: true
+        enum: 
+          - personal
+          - business
+      name:
+        required: false
+      country:
+        required: false
+    responses:
+      200:
+        body:
+          application/json:
+            type: Account[]
+            example:
+              !include Example/Accountexample.raml
+      400:
+        body:
+          application/json:
+            example:
+              message: "GET request has Failed"
+
+  post:
+    securedBy:
+      - oauth_2_0
+        
+    description: This is POST method
+    body:
+      application/json:
+        type: AccountWithoutID[]
+        example:
+          !include Example/AccountWithoutIDexample.raml
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              message: "Account created (but not really)"
+
+      400:
+        body:
+          application/json:
+            example:
+              messsage: "POST request has failed!!"
+      
